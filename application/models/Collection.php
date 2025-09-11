@@ -33,8 +33,6 @@ class Collection extends Model
             }
 
             $this->client->selectDatabase($db)->createCollection($collection, $options);
-            $this->deleteTemporaryDb($db);
-
             return true;
         } catch (Exception $e) {
             exit($e->getMessage());
