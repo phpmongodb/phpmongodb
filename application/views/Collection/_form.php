@@ -1,62 +1,79 @@
-<form method="post" name="form-delete-collection" id="form-delete-collection" action="index.php" >
+<div x-data="{ open: false, mode: '', collection: '', oldCollection: '', load: '' }"
+    @open-modal.window="
+        if ($event.detail.type === 'edit-collection') {
+            open = true;
+            mode = 'edit';
+            collection = $event.detail.collection;
+            oldCollection = $event.detail.collection;
+            load = 'Collection/RenameCollection';
+        } else if ($event.detail.type === 'delete-collection') {
+            open = true;
+            mode = 'delete';
+            collection = $event.detail.collection;
+            oldCollection = $event.detail.collection;
+            load = 'Collection/DropCollection';
+        }
+     ">
 
-    <div class="modal small hide fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h3 id="myModalLabel">Delete Confirmation</h3>
-        </div>
-        <div class="modal-body">
-            <input type="text" value="" id="pop-up-collection" name="collection" class="input-xlarge" required="required">
+    <!-- Overlay -->
+    <div x-show="open" x-cloak
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <!-- Modal -->
+        <form method="post" action="index.php"
+            class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
 
-            <p class="error-text" id="pop-up-error-text"><i class="icon-warning-sign modal-icon"></i>Are you sure you want to delete collection ?</p>
-        </div>
-        <div class="modal-footer">
-            <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-            <button class="btn " id="button-create-collection"><i class="icon-save" ></i> Save</button>
-            <button id="button-delete-collection" class="btn btn-danger" data-dismiss="modal">Delete</button>
-        </div>
+            <!-- Header -->
+            <div class="flex justify-between items-center border-b pb-2 mb-4">
+                <h3 class="text-lg font-semibold text-gray-800"
+                    x-text="mode === 'edit' ? 'Edit Collection' : 'Delete Collection'"></h3>
+                <button type="button" @click="open=false"
+                    class="text-gray-400 hover:text-gray-600">×</button>
+            </div>
+
+            <!-- Body -->
+            <div class="mb-4">
+                <!-- Edit Mode -->
+                <template x-if="mode === 'edit'">
+                    <input type="text" name="collection" x-model="collection"
+                        class="w-full border rounded px-3 py-2" required>
+                </template>
+
+                <!-- Delete Mode -->
+                <template x-if="mode === 'delete'">
+                    <p class="text-red-600 text-sm">
+                        <?php I18n::p('A_Y_W_T_D_C'); ?>
+                    </p>
+                </template>
+            </div>
+
+            <!-- Footer -->
+            <div class="flex justify-end gap-3">
+                <button type="button" @click="open=false"
+                    class="px-3 py-2 border rounded text-gray-600 hover:bg-gray-100">
+                    <?php I18n::p('CANCEL'); ?>
+                </button>
+
+                <!-- Save -->
+                <template x-if="mode === 'edit'">
+                    <button type="submit"
+                        class="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                        <?php I18n::p('SAVE'); ?>
+                    </button>
+                </template>
+
+                <!-- Delete -->
+                <template x-if="mode === 'delete'">
+                    <button type="submit" name="delete" value="1"
+                        class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                        <?php I18n::p('DELETE'); ?>
+                    </button>
+                </template>
+            </div>
+
+            <!-- Hidden Fields -->
+            <input type="hidden" name="load" :value="load">
+            <input type="hidden" name="db" value="<?php echo $this->db; ?>">
+            <input type="hidden" name="old_collection" :value="oldCollection">
+        </form>
     </div>
-    <input type="hidden" id="pop-up-load" name="load" value="" />
-    <input type="hidden" name="db" id="pop-up-db" value="<?php echo $this->db; ?>" />
-    <input type="hidden" id="pop-up-old_collection" name="old_collection" value="" />
-</form> 
-
-
-
-<script type="text/javascript">
-    $(document).ready(function() {
-
-
-        $("a[data-edit-collection]").click(function() {
-
-            $("#pop-up-collection").val(decodeURIComponent($(this).attr("data-edit-collection")));
-            $("#pop-up-old_collection").val($(this).attr("data-edit-collection"));
-            $("#pop-up-load").val("Collection/RenameCollection");
-            $('#button-delete-collection').hide();
-            $('#button-create-collection').show();
-            $("#pop-up-collection").show();
-            $('#pop-up-error-text').hide();
-            $("#myModalLabel").text('Edit Collection');
-
-        });
-
-        $("a[data-delete-collection]").click(function() {
-            $("#pop-up-collection").val(decodeURIComponent($(this).attr("data-delete-collection")));
-            $("#pop-up-load").val("Collection/DropCollection");
-            $('#button-delete-collection').show();
-            $('#button-create-collection').hide();
-            $("#pop-up-collection").hide();
-            $('#pop-up-error-text').show();
-            $("#myModalLabel").text('Delete Collection');
-
-        });
-        $('#button-delete-collection').click(function() {
-
-            $('#form-delete-collection').submit();
-            return true;
-        });
-
-    });
-
-
-</script>
+</div>
