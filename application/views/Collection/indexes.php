@@ -29,7 +29,7 @@
                                 echo '<td>' . htmlspecialchars($key) . '</td>';
                                 echo '<td>';
                                 if (is_array($value)) {
-                                    echo '<pre>' . $this->data['cryptography']->highlight($this->data['cryptography']->arrayToJSON($value)) . '</pre>';
+                                    echo '<pre>' . $this->data['formatter']->highlight($this->data['formatter']->arrayToJSON($value)) . '</pre>';
                                 } else {
                                     echo htmlspecialchars((string)$value);
                                 }

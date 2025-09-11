@@ -1,21 +1,24 @@
 <?php
+
 /**
  * @package PHPmongoDB
- * @version 1.0.0
+ * @version 2.0.0
  */
 defined('PMDDA') or die('Restricted access');
 
-class View {
+class View
+{
 
     protected static $content;
     protected static $message;
-    
+
     /**
      * 
      * @param string $content
      * @author Nanhe Kumar <nanhe.kumar@gmail.com>
      */
-    public static function setContent($content) {
+    public static function setContent($content)
+    {
 
         self::$content = $content;
     }
@@ -24,7 +27,8 @@ class View {
      * @return string
      * @author Nanhe Kumar <nanhe.kumar@gmail.com>
      */
-    public static function getContent() {
+    public static function getContent()
+    {
         return self::$content;
     }
     /**
@@ -32,17 +36,18 @@ class View {
      * @param string $message
      * @author Nanhe Kumar <nanhe.kumar@gmail.com>
      */
-    public static function setMessage($message) {
+    public static function setMessage($message)
+    {
         self::$message = $message;
     }
-    
+
     /**
      * 
      * @return string
      * @author Nanhe Kumar <nanhe.kumar@gmail.com>
      */
-    public static function getMessage() {
+    public static function getMessage()
+    {
         return self::$message;
     }
-
 }

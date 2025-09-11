@@ -2,8 +2,8 @@
 
 /**
  * @package PHPmongoDB
- * @version 1.0.0
- * @link http://www.phpmongodb.org
+ * @version 2.0.0
+ * @link https://github.com/phpmongodb/phpmongodb
  */
 defined('PMDDA') or die('Restricted access');
 
@@ -28,13 +28,13 @@ class ServerController extends Controller
         $dbList = $model->listDatabases();
 
         $layout = $this->request->isAjax() ? 'command' : 'execute';
-        $cryptography = new Cryptography();
+        $formatter = new Formatter();
         $this->display(
             $layout,
             array(
                 'databases' => $dbList,
                 'code' => isset($code) ? $code : 'db.getCollectionNames()',
-                'output' => !empty($return['output']) ? $cryptography->formatMongoOutput($return['output'])  : null,
+                'output' => !empty($return['output']) ? $formatter->formatMongoOutput($return['output'])  : null,
                 //'output' => !empty($return['output']) ? $return['output']  : null,
                 'error' => !empty($return['message']) ? $return['message'] : null,
                 'db' => isset($db) ? $db : ''

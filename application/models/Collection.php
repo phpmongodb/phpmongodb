@@ -2,8 +2,8 @@
 
 /**
  * @package PHPmongoDB
- * @version 1.0.0
- * @link http://www.phpmongodb.org
+ * @version 2.0.0
+ * @link https://github.com/phpmongodb/phpmongodb
  * @author Nanhe Kumar <nanhe.kumar@gmail.com>
  */
 defined('PMDDA') or die('Restricted access');

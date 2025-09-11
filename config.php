@@ -2,32 +2,33 @@
 
 /**
  * @author Nanhe Kumar <nanhe.kumar@gmail.com>
- * @version 1.0.0
+ * @version 2.0.0
  * @package PHPMongoDB
  */
 
-class Config {
+class Config
+{
 
     public static $theme = 'default';
-    public static $autocomplete=false;
+    public static $autocomplete = false;
     public static $language = array(
         'english' => 'English',
         'german' => 'German',
     );
-    public static $server=array(
+    public static $server = array(
         'name' => "Localhost",
-        'server'=>false,
+        'server' => false,
         'host' => "mongodb://127.0.0.1",
-        'port'=>"27017",
-        'timeout'=>0,
+        'port' => "27017",
+        'timeout' => 0,
     );
     public static $authentication = array(
-        'authentication'=>false,
+        'authentication' => false,
         'user' => 'admin',
         'password' => 'admin'
     );
     public static $authorization = array(
-        'readonly'=>false,
+        'readonly' => false,
     );
 
     /**
@@ -41,7 +42,4 @@ class Config {
             'replicaSet' => false,
         ), //
     );
-
 }
-
-?>

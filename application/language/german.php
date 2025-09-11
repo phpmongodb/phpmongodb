@@ -19,7 +19,7 @@ $language = array(
     //Index
     'LAN_NOT_AVA' => 'Sprache nicht verfügbar',
     //Database
-    'D_R_S' => 'Die Datenbank wurde erfolgreich umbenennen',
+    'D_R_S' => "Datenbank '%s' wurde erfolgreich nach '%s' kopiert",
     'I_D_N' => 'Ungültige Datenbanknamen',
     'D_C' => '%s Datenbank erstellt.',
     'E_D_N' => 'Enter Database Name',

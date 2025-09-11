@@ -19,7 +19,7 @@ $language = array(
     //Index
     'LAN_NOT_AVA' => 'Language not available',
     //Database
-    'D_R_S' => 'Database rename successfully',
+    'D_R_S' => "Database '%s' copied to '%s' successfully",
     'I_D_N' => 'Invalid database name',
     'D_C' => '%s database created.',
     'E_D_N' => 'Enter Database Name',

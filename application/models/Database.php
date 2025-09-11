@@ -2,8 +2,8 @@
 
 /**
  * @package PHPmongoDB
- * @version 1.0.0
- * @link http://www.phpmongodb.org
+ * @version 2.0.0
+ * @link https://github.com/phpmongodb/phpmongodb
  * @author Nanhe Kumar <nanhe.kumar@gmail.com>
  */
 
@@ -18,8 +18,18 @@ class Database extends Model
     public function createDB($name)
     {
         try {
+            // Select the database and collection
             $collection = $this->client->selectDatabase($name)->createCollection('default');
-            return ['success' => true, 'message' => "Database '$name' created with collection 'default'"];
+
+            // Insert metadata document
+            $this->client->selectCollection($name, 'default')->insertOne([
+                '_phpmongodb_init' => true,
+                'note' => 'This document was inserted by phpMongoDB to initialize the database.',
+                'created_by' => 'phpmongodb',
+                'created_at' => new MongoDB\BSON\UTCDateTime()
+            ]);
+
+            return ['success' => true, 'message' => "Database '$name' created with default collection and metadata document."];
         } catch (MongoDB\Exception\Exception $e) {
             return ['success' => false, 'error' => $e->getMessage()];
         }
@@ -27,20 +37,29 @@ class Database extends Model
 
 
 
+
     public function dropDatabase($db)
     {
         try {
             $this->client->selectDatabase($db)->drop();
-            return true;
+            return [
+                'success' => true,
+                'message' => "Database '$db' dropped successfully."
+            ];
         } catch (MongoDBException $e) {
-            return $e->getMessage();
+            return [
+                'success' => false,
+                'message' => $e->getMessage()
+            ];
         }
     }
 
-    public function renameDatabase($oldDB,  $newDB)
+
+    public function renameDatabaseOld($oldDB,  $newDB)
     {
         try {
             $response = $this->copyDatabase($oldDB, $newDB);
+
             if (isset($response['ok']) && $response['ok'] == 1) {
                 try {
                     $this->client->selectDatabase($oldDB)->drop();
@@ -53,6 +72,61 @@ class Database extends Model
             }
         } catch (MongoDBException $e) {
             return $e->getMessage();
+        }
+    }
+    public function renameDatabase($oldDb, $newDb)
+    {
+        try {
+            $client = $this->client;
+
+            if ($this->isDbExist($newDb)) {
+                return [
+                    'success' => false,
+                    'message' => "Database '$newDb' already exists."
+                ];
+            }
+
+
+            // Step 1: List all collections in old DB
+            $collections = $client->selectDatabase($oldDb)->listCollections();
+
+            foreach ($collections as $collectionInfo) {
+                $collectionName = $collectionInfo->getName();
+
+                // Step 2: Fetch all documents from old collection
+                $documents = $client->selectCollection($oldDb, $collectionName)->find();
+
+                // Step 3: Insert documents into new collection in new DB
+                $newCollection = $client->selectCollection($newDb, $collectionName);
+                $batch = [];
+
+                foreach ($documents as $doc) {
+                    $batch[] = $doc;
+                    if (count($batch) >= 1000) {
+                        $newCollection->insertMany($batch);
+                        $batch = [];
+                    }
+                }
+                if (!empty($batch)) {
+                    $newCollection->insertMany($batch);
+                }
+
+                // Optional: Drop old collection (comment out if unsure)
+                // $client->selectCollection($oldDb, $collectionName)->drop();
+            }
+
+            // Optional: Drop old database completely (comment out if unsure)
+            $client->selectDatabase($oldDb)->drop();
+
+            return [
+                'success' => true,
+                'message' => I18n::t('D_R_S', $oldDb, $newDb)
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => $e->getMessage()
+            ];
         }
     }
 
@@ -184,16 +258,21 @@ class Database extends Model
         return "execute (db.eval) is deprecated in MongoDB and not supported in the modern PHP driver.";
     }
 
-
-
     public function isDbExist($db)
     {
-        $databases = $this->listDatabases();
-        $dbList = array_column($databases, 'name');
-        $session = Application::getInstance('Session');
-        $tmpDbList = $session->databases ?? [];
+        try {
+            // List all database names
+            $databases = $this->client->listDatabases();
 
-        $allDbs = array_merge($dbList, $tmpDbList);
-        return in_array($db, $allDbs, true);
+            foreach ($databases as $databaseInfo) {
+                if ($databaseInfo->getName() === $db) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (Exception $e) {
+            // Optional: handle/log error
+            return false;
+        }
     }
 }

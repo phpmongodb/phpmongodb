@@ -1,11 +1,13 @@
 <?php
+
 /**
  * @package PHPmongoDB
- * @version 1.0.0
+ * @version 2.0.0
  */
 defined('PMDDA') or die('Restricted access');
 
-abstract class Data {
+abstract class Data
+{
 
     protected $data = array();
 
@@ -16,7 +18,8 @@ abstract class Data {
      * @author Nanhe Kumar <nanhe.kumar@gmail.com>
      * @access public
      */
-    public function __get($name) {
+    public function __get($name)
+    {
         if (array_key_exists($name, $this->data)) {
             return $this->data[$name];
         }
@@ -32,7 +35,8 @@ abstract class Data {
      * @author Nanhe Kumar <nanhe.kumar@gmail.com>
      * @access public
      */
-    public function __set($name, $value) {
+    public function __set($name, $value)
+    {
         $this->data[$name] = $value;
     }
 
@@ -43,7 +47,8 @@ abstract class Data {
      * @author Nanhe Kumar <nanhe.kumar@gmail.com>
      * @access public
      */
-    public function __isset($name) {
+    public function __isset($name)
+    {
         return isset($this->data[$name]);
     }
 
@@ -53,8 +58,8 @@ abstract class Data {
      * @author Nanhe Kumar <nanhe.kumar@gmail.com>
      * @access public
      */
-    public function __unset($name) {
+    public function __unset($name)
+    {
         unset($this->data[$name]);
     }
-
 }

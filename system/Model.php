@@ -89,12 +89,6 @@ class Model
     }
 
 
-
-    public function copyDatabase($fromdb, $todb, $fromhost = 'localhost')
-    {
-        return "copydb' command is deprecated in MongoDB 4.0+. You must manually export/import or clone data.";
-    }
-
     public function find($db, $collection, $query = [], $fields = [], $limit = 0, $skip = 0, $format = 'array', $orderBy = ['_id' => 1])
     {
         try {
@@ -134,48 +128,28 @@ class Model
     public function serverStatus()
     {
         try {
-            $command = new Command(['serverStatus' => 1]);
-            return $this->manager->executeCommand('admin', $command)->toArray();
+            $command = new MongoDB\Driver\Command(['serverStatus' => 1]);
+            $cursor = $this->manager->executeCommand('admin', $command);
+
+            // Return raw BSONDocument (preserves types)
+            $document = current($cursor->toArray());
+
+            return [
+                'success' => true,
+                'output' => $document
+            ];
         } catch (Exception $e) {
-            return $e->getMessage();
+            return [
+                'success' => false,
+                'message' => $e->getMessage()
+            ];
         }
     }
 
-    public function updateTemporaryDb($db, $oldDb)
-    {
-        $session = Application::getInstance('Session');
-        $databases = $session->databases ?? [];
 
-        if (($key = array_search($oldDb, $databases)) !== false) {
-            unset($databases[$key]);
-        }
 
-        $databases[] = $db;
-        $session->databases = array_unique($databases);
-        return $session->databases;
-    }
 
-    public function saveTemporaryDb($db)
-    {
-        $session = Application::getInstance('Session');
-        $databases = $session->databases ?? [];
-        $databases[] = $db;
-        $session->databases = array_unique($databases);
-        return $session->databases;
-    }
 
-    public function deleteTemporaryDb($db)
-    {
-        $session = Application::getInstance('Session');
-        $databases = $session->databases ?? [];
-
-        if (($key = array_search($db, $databases)) !== false) {
-            unset($databases[$key]);
-        }
-
-        $session->databases = array_unique($databases);
-        return $session->databases;
-    }
     public function countDocuments($dbName, $collectionName, $query = [])
     {
         $collection = $this->client->selectDatabase($dbName)->selectCollection($collectionName);

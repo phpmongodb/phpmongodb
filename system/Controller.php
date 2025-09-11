@@ -2,7 +2,7 @@
 
 /**
  * @package PHPmongoDB
- * @version 1.0.0
+ * @version 2.0.0
  */
 defined('PMDDA') or die('Restricted access');
 

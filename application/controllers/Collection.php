@@ -2,13 +2,15 @@
 
 /**
  * @package PHPmongoDB
- * @version 1.0.0
- * @link http://www.phpmongodb.org
+ * @version 2.0.0
+ * @link https://github.com/phpmongodb/phpmongodb
  */
 defined('PMDDA') or die('Restricted access');
 /*
  * Controller
  */
+
+use MongoDB\BSON\ObjectId;
 
 class CollectionController extends Controller
 {
@@ -87,7 +89,7 @@ class CollectionController extends Controller
         } else {
             $data['error']  = $response['message'];
         }
-        $data['cryptography'] = new Cryptography();
+        $data['formatter'] = new Formatter();
         $this->display('indexes', $data);
     }
 
@@ -189,7 +191,7 @@ class CollectionController extends Controller
 
     protected function getQuery($query = array())
     {
-        $cryptography = new Cryptography();
+        $formatter = new Formatter();
         for ($ind = 0; $ind < count($query); $ind += 3) {
             if (empty($query[$ind])) {
                 unset($query[$ind]);
@@ -206,11 +208,11 @@ class CollectionController extends Controller
         if (count($query) == 0) {
             return $query;
         } else if (count($query) == 3) {
-            $query = $cryptography->executeValue($query, 2);
+            $query = $formatter->executeValue($query, 2);
             return $query;
         }
-        $query = $cryptography->executeAND($query);
-        $query = $cryptography->executeOR($query);
+        $query = $formatter->executeAND($query);
+        $query = $formatter->executeOR($query);
 
         return $query[0];
     }
@@ -237,7 +239,7 @@ class CollectionController extends Controller
     {
         $this->setDB();
         $this->setCollection();
-        $cryptography = new Cryptography();
+        $formatter = new Formatter();
         if ($this->validation($this->db, $this->collection)) {
             $record = array();
             $skip = $this->request->getParam('start', 0);
@@ -252,7 +254,7 @@ class CollectionController extends Controller
                         $query = $this->getQuery($this->request->getParam('query'));
                         break;
                     case 'array':
-                        $query = $cryptography->stringToArray($this->request->getParam('query'));
+                        $query = $formatter->stringToArray($this->request->getParam('query'));
                         break;
                     case 'json':
                         $query = $this->request->getParam('query');
@@ -272,7 +274,7 @@ class CollectionController extends Controller
                     $total = $this->getModel()->countDocuments($this->db, $this->collection, $query);
                 }
 
-                $record = $cryptography->decode($cursor, $type);
+                $record = $formatter->decode($cursor, $type);
             }
             $this->application->view = 'Collection';
             $format = array('json', 'array', 'document', 'jsonv2');
@@ -290,12 +292,12 @@ class CollectionController extends Controller
         $id = $this->request->getParam('id');
         $idType = $this->request->getParam('id_type');
         $format = $this->request->getParam('format');
-        $cryptography = new Cryptography();
+        $formatter = new Formatter();
         $model = $this->getModel();
         if ($this->request->isPost()) {
 
             if ($this->request->getParam('format') == 'array') {
-                $data = $cryptography->stringToArray($this->request->getParam('data'));
+                $data = $formatter->stringToArray($this->request->getParam('data'));
                 if (is_array($data)) {
                     $response = $model->updateById($this->db, $this->collection, $id, $data, 'array', $idType);
                 } else {
@@ -322,8 +324,8 @@ class CollectionController extends Controller
 
             if ($cursor) {
                 unset($cursor['_id']);
-                $record['json'] = $cryptography->arrayToJSON($cursor);
-                $record['array'] = $cryptography->arrayToString($cursor);
+                $record['json'] = $formatter->arrayToJSON($cursor);
+                $record['array'] = $formatter->arrayToString($cursor);
                 $this->application->view = 'Collection';
                 $this->display('edit', array('record' => $record, 'format' => $format, 'id' => $id));
             } else {
@@ -393,8 +395,8 @@ class CollectionController extends Controller
                     $this->insertRecord($document);
                     break;
                 case 'array':
-                    $cryptography = new Cryptography();
-                    $document = $cryptography->stringToArray($this->request->getParam('data'));
+                    $formatter = new Formatter();
+                    $document = $formatter->stringToArray($this->request->getParam('data'));
                     $this->insertRecord($document);
                     break;
                 case 'json':
@@ -554,15 +556,18 @@ class CollectionController extends Controller
     protected function quickExport()
     {
         $cursor = $this->getModel()->find($this->db, $this->collection);
+
         $file = new File(sys_get_temp_dir(), $this->collection . '.json');
         $file->delete();
-        $cryptography = new Cryptography();
-        while ($cursor->hasNext()) {
-            $document = $cursor->getNext();
-            $json = $cryptography->arrayToJSON($document);
+
+        $formatter = new Formatter();
+
+        foreach ($cursor as $document) {
+            $json = $formatter->arrayToJSON($document);
             $json = str_replace(array("\n", "\t"), '', $json);
             $file->write($json . "\n");
         }
+
         if ($file->success) {
             $file->download();
         } else {
@@ -570,25 +575,47 @@ class CollectionController extends Controller
         }
     }
 
+
     protected function customExport()
     {
-        $fields = array();
-        $query = array();
+        $fields = [];
+        $query = [];
         $limit = $this->request->getParam('limit');
         $skip = $this->request->getParam('skip');
-        $limit = empty($limit) ? false : $limit;
-        $skip = empty($skip) ? false : $skip;
-        $path = sys_get_temp_dir();
+        $limit = empty($limit) ? 0 : (int) $limit;
+        $skip = empty($skip) ? 0 : (int) $skip;
+
         $fileName = $this->request->getParam('file_name');
         $fileName = (empty($fileName) ? $this->collection : $fileName) . '.json';
+
         $cursor = $this->getModel()->find($this->db, $this->collection, $query, $fields, $limit, $skip);
+
+        // Handle both cursor and array
+        if (is_array($cursor)) {
+            $documents = $cursor;
+        } elseif ($cursor instanceof \MongoDB\Driver\Cursor || $cursor instanceof \Traversable) {
+            $documents = iterator_to_array($cursor, false);
+        } else {
+            $this->message->error = "Unable to retrieve documents.";
+            return false;
+        }
+        $path = sys_get_temp_dir();
         $file = new File($path, $fileName);
         $file->delete();
-        $cryptography = new Cryptography();
-        while ($cursor->hasNext()) {
-            $document = $cursor->getNext();
-            $file->write($cryptography->arrayToJSON($document) . "\n");
+
+        foreach ($documents as $doc) {
+            // Try BSON toJSON if possible
+            if (function_exists('MongoDB\BSON\toJSON')) {
+                $json = \MongoDB\BSON\toJSON(\MongoDB\BSON\fromPHP($doc));
+            } else {
+                $formatter = new Formatter();
+                $json = $formatter->arrayToJSON($doc);
+            }
+
+            $file->write($json . "\n");
         }
+
+        // Save to file
         if ($this->request->getParam('text_or_save') == 'save') {
             if ($file->success) {
                 if ($this->request->getParam('compression') == 'none') {
@@ -607,9 +634,10 @@ class CollectionController extends Controller
                 return false;
             }
         } else {
-            return file_get_contents($path . $fileName);
+            return file_get_contents($path . '/' . $fileName);
         }
     }
+
 
     protected function createCompress($fileName, File $file)
     {
@@ -646,33 +674,52 @@ class CollectionController extends Controller
         }
     }
 
+
+
     public function Import()
     {
         $this->isReadonly();
         $this->setDB();
         $this->setCollection();
+
         if ($this->request->isPost()) {
-            if ($_FILES['import_file']['error'] == UPLOAD_ERR_OK && is_uploaded_file($_FILES['import_file']['tmp_name'])) { //checks that file is uploaded
+            if ($_FILES['import_file']['error'] == UPLOAD_ERR_OK && is_uploaded_file($_FILES['import_file']['tmp_name'])) {
                 $handle = @fopen($_FILES['import_file']['tmp_name'], "r");
                 if ($handle) {
                     while (($record = fgets($handle)) !== false) {
-                        $response = $this->getModel()->insert($this->db, $this->collection, $record, 'json');
-                        if ($response['ok'] == 1) {
-                            $this->message->sucess = I18n::t('A_D_I_S');
+                        $decoded = json_decode(trim($record), true);
+
+                        if (json_last_error() === JSON_ERROR_NONE) {
+                            // Convert $oid to ObjectId
+                            if (isset($decoded['_id']['$oid'])) {
+                                $decoded['_id'] = new ObjectId($decoded['_id']['$oid']);
+                            }
+
+                            $response = $this->getModel()->insert($this->db, $this->collection, $decoded);
+                            if ($response['success']) {
+                                $this->message->sucess = I18n::t('A_D_I_S');
+                            } else {
+                                $this->message->error = $response['message'];
+                            }
                         } else {
-                            $this->message->error = $response['errmsg'];
+                            $this->message->error = "Invalid JSON: " . json_last_error_msg();
                         }
                     }
+
                     if (!feof($handle)) {
                         $this->message->error = I18n::t('E_U_F');
                     }
+
                     fclose($handle);
                 }
             }
         }
+
         $this->application->view = 'Collection';
         $this->display('import');
     }
+
+
 
     public function Search()
     {

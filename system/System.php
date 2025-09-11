@@ -1,35 +1,42 @@
 <?php
+
 /**
  * @package PHPmongoDB
- * @version 1.0.0
+ * @version 2.0.0
  */
 defined('PMDDA') or die('Restricted access');
 
-class System {
+class System
+{
 
     protected $application;
 
-    public function start() {
+    public function start()
+    {
         $this->application = new Application();
         $this->application->init();
         $this->application();
     }
-    public function isTheme(){
+    public function isTheme()
+    {
         return $this->application->theme;
     }
 
-    protected function getObject($class) {
+    protected function getObject($class)
+    {
         return new $class;
     }
 
-    protected function getProperties() {
+    protected function getProperties()
+    {
         return array(
             'application' => $this->application,
             'message' => new Message,
         );
     }
 
-    protected function application() {
+    protected function application()
+    {
 
         try {
             $controller = $this->getObject($this->application->controller . 'Controller');
@@ -44,15 +51,15 @@ class System {
             } else {
                 throw new Exception('Method  ' . $this->application->action . ' doe not exitst');
             }
-           
         } catch (Exception $e) {
             echo 'Caught exception: ', $e->getMessage(), "\n";
             exit();
         }
     }
-    public function getTheme() {
+    public function getTheme()
+    {
         try {
-            $theme = getcwd() . '/application/themes/'.Config::$theme.'/index.php';
+            $theme = getcwd() . '/application/themes/' . Config::$theme . '/index.php';
             if (!file_exists($theme)) {
                 throw new Exception('Controller cannot find the Theme file ' . $theme);
             } else {
@@ -62,10 +69,8 @@ class System {
             echo 'Caught exception: ', $e->getMessage(), "\n";
         }
     }
-    function getView(){
+    function getView()
+    {
         echo View::getContent();
     }
-
 }
-
-?>

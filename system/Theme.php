@@ -1,29 +1,35 @@
 <?php
+
 /**
  * @package PHPmongoDB
- * @version 1.0.0
+ * @version 2.0.0
  */
 defined('PMDDA') or die('Restricted access');
 
-class Theme {
+class Theme
+{
 
     private static $themePath = '/application/themes/';
     private static $themeUri;
     private static $homeUri;
-    
-    public static function getThemePath(){
-        return self::$themePath.Config::$theme.'/';
+
+    public static function getThemePath()
+    {
+        return self::$themePath . Config::$theme . '/';
     }
 
-    public static function absolutePath() {
+    public static function absolutePath()
+    {
         return getcwd() . '/' . self::getThemePath();
     }
 
-    public static function relativePath() {
+    public static function relativePath()
+    {
         return realpath(self::absolutePath());
     }
 
-    private static function __setThemeUri() {
+    private static function __setThemeUri()
+    {
         if (!isset(self::$homeUri)) {
             self::__setHomeUri();
         }
@@ -31,7 +37,8 @@ class Theme {
         self::$themeUri = self::$homeUri . self::getThemePath();
     }
 
-    public static function __setHomeUri() {
+    public static function __setHomeUri()
+    {
         self::$homeUri = 'http';
         if (isset($_SERVER['HTTPS']) && $_SERVER["HTTPS"] == "on") {
             self::$homeUri .= "s";
@@ -42,48 +49,53 @@ class Theme {
         } else {
             self::$homeUri .= $_SERVER["SERVER_NAME"];
         }
-        self::$homeUri.= str_replace('/index.php', '', $_SERVER['PHP_SELF']);
+        self::$homeUri .= str_replace('/index.php', '', $_SERVER['PHP_SELF']);
     }
 
 
-    public static function getPath() {
+    public static function getPath()
+    {
         if (!isset(self::$themeUri)) {
             self::__setThemeUri();
         }
         return self::$themeUri;
     }
-    public static function getVersion($file){
-       $file=getcwd().$file;
-       if (file_exists($file)) {
-           return filemtime($file);
-       }
-       return FALSE;
+    public static function getVersion($file)
+    {
+        $file = getcwd() . $file;
+        if (file_exists($file)) {
+            return filemtime($file);
+        }
+        return FALSE;
     }
 
-    public static function URL($load = 'Index/Index', $queryString = array()) {
+    public static function URL($load = 'Index/Index', $queryString = array())
+    {
         if (!self::$homeUri) {
             self::__setThemeUri();
         }
         $url = self::__setThemeUri() . 'index.php?load=' . $load;
         if (is_array($queryString)) {
             foreach ($queryString as $k => $v) {
-                if(is_string($v))
-                    $url.= '&'.$k.'='.urlencode($v);
+                if (is_string($v))
+                    $url .= '&' . $k . '=' . urlencode($v);
                 else
-                    $url.= '&'.$k.'='.$v;
+                    $url .= '&' . $k . '=' . $v;
             }
         }
         return $url;
     }
 
-    public static function getHome() {
+    public static function getHome()
+    {
         if (!isset(self::$homeUri)) {
             self::__setHomeUri();
         }
         return self::$homeUri;
     }
 
-    public static function currentURL($start = FALSE) {
+    public static function currentURL($start = FALSE)
+    {
         $url = self::$homeUri . '/index.php';
         if (!empty($_SERVER['QUERY_STRING'])) {
             $queryString = explode('&', $_SERVER['QUERY_STRING']);
@@ -95,7 +107,7 @@ class Theme {
                             continue;
                         }
                     }
-                    $url.=(strpos($url, '?') !== false ? '&' : '?') . $value;
+                    $url .= (strpos($url, '?') !== false ? '&' : '?') . $value;
                 }
             }
         }
@@ -103,12 +115,14 @@ class Theme {
         return $url;
     }
 
-    public static function paginationURL($url, $start) {
-        $url.=(strpos($url, '?') !== false ? '&' : '?') . 'start=' . $start.'&theme=true';
+    public static function paginationURL($url, $start)
+    {
+        $url .= (strpos($url, '?') !== false ? '&' : '?') . 'start=' . $start . '&theme=true';
         return $url;
     }
 
-    public static function pagination($total = 0, $split = 10) {
+    public static function pagination($total = 0, $split = 10)
+    {
         $url = self::currentURL(TRUE);
         $current = (isset($_GET['start']) ? $_GET['start'] : 0);
 
@@ -133,7 +147,7 @@ class Theme {
                 echo '<li><a href="' . self::paginationURL($url, (($current - 1) * $split)) . '">Prev</a></li>';
             }
 
-            
+
             for (; $page < $end; $page++) {
                 echo '<li class="' . ($current == $page ? "active" : "") . '"><a href="' . ($current != $page ? self::paginationURL($url, ($page * $split)) : 'javascript:void(0)') . '" >' . ($page + 1) . '</a></li>';
             }
@@ -144,5 +158,4 @@ class Theme {
             echo '</div>';
         }
     }
-
 }

@@ -1,23 +1,27 @@
 <?php
+
 /**
  * @package PHPmongoDB
  * @version 1.0.0
  */
 defined('PMDDA') or die('Restricted access');
 
-class File {
+class File
+{
 
     public $path;
     public $file;
     public $success = true;
     public $message;
 
-    public function __construct($path = NULL, $file = NULL) {
+    public function __construct($path = NULL, $file = NULL)
+    {
         $this->path = $path;
         $this->file = $file;
     }
 
-    public function write($content) {
+    public function write($content)
+    {
 
         if (!$handle = fopen($this->path . $this->file, 'a')) {
             $this->success = false;
@@ -35,7 +39,8 @@ class File {
         fclose($handle);
     }
 
-    public function download($file = FALSE, $path = FALSE) {
+    public function download($file = FALSE, $path = FALSE)
+    {
         if (!$file && !$path) {
             $file = $this->path . $this->file;
         } else if (!$path) {
@@ -57,59 +62,76 @@ class File {
         exit;
     }
 
-    public function delete($file = FALSE,$path=FALSE) {
-         if (file_exists($this->path.$this->file)) {
+    public function delete($file = FALSE, $path = FALSE)
+    {
+        if (file_exists($this->path . $this->file)) {
             unlink($this->path . $this->file);
-         }
+        }
     }
-    
+
     /* creates a compressed zip file */
 
-    function createZip($files = array(), $destination = '', $overwrite = false,$path=false) {
-        if(!$path){
-            $path=$this->path;
+    function createZip($files = array(), $destination = '', $overwrite = false, $path = false)
+    {
+        if (!$path) {
+            $path = $this->path;
         }
-        $destination=$path.$destination;
-        //if the zip file already exists and overwrite is false, return false
-        if (file_exists($destination) && !$overwrite) {
-            $this->message="the zip file already exists and overwrite is false";
-            return false;
+
+        // Ensure path ends with a slash
+        if (substr($path, -1) !== DIRECTORY_SEPARATOR) {
+            $path .= DIRECTORY_SEPARATOR;
         }
-        //vars
+
+        $destination = $path . $destination;
+
+        // Check if destination file exists and overwrite is false
+        if (file_exists($destination)) {
+            if ($overwrite) {
+                unlink($destination); // Delete old zip file
+            } else {
+                $this->message = "❌ Zip file already exists and overwrite is false";
+                return false;
+            }
+        }
+
+        // Validate input files
         $validFiles = array();
-        //if files were passed in...
         if (is_array($files)) {
-            //cycle through each file
             foreach ($files as $file) {
-                //make sure the file exists
-                if (file_exists($path.$file)) {
+                $fullPath = $path . $file;
+                if (file_exists($fullPath)) {
                     $validFiles[] = $file;
                 }
             }
         }
-        //if we have good files...
+
+        // Proceed if we have valid files
         if (count($validFiles)) {
-            //create the archive
             $zip = new ZipArchive();
-            if ($zip->open($destination, $overwrite ? ZIPARCHIVE::OVERWRITE : ZIPARCHIVE::CREATE) !== true) {
-                $this->message="unable to create the archive";
+            $result = $zip->open($destination, ZIPARCHIVE::CREATE);
+
+            if ($result !== true) {
+                $this->message = "❌ Unable to create the zip: error code $result";
                 return false;
             }
-            //add the files
+
+            // Add valid files to the archive
             foreach ($validFiles as $file) {
-                $zip->addFile($path.$file, $file);
+                $zip->addFile($path . $file, $file);
             }
-            //debug
-            //echo 'The zip archive contains ',$zip->numFiles,' files with a status of ',$zip->status;
-            //close the zip -- done!
+
             $zip->close();
 
-            //check to make sure the file exists
-            return file_exists($destination);
+            // Confirm the zip file was created
+            if (file_exists($destination)) {
+                return true;
+            } else {
+                $this->message = "❌ Zip file creation failed after close()";
+                return false;
+            }
         } else {
-            $this->message="file not exitst";
+            $this->message = "❌ No valid files found to zip.";
             return false;
         }
     }
-
 }

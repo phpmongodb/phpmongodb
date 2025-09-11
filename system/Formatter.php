@@ -2,11 +2,11 @@
 
 /**
  * @package PHPmongoDB
- * @version 1.0.0
+ * @version 2.0.0
  */
 defined('PMDDA') or die('Restricted access');
 
-class Cryptography
+class Formatter
 {
 
     protected $data;
@@ -195,6 +195,9 @@ class Cryptography
     {
 
         switch (get_class($object)) {
+            case "stdClass":
+                $json = json_encode($object, JSON_PRETTY_PRINT);
+                break;
             case "MongoId":
                 $json = 'ObjectId("' . $object->__toString() . '")';
                 break;
@@ -377,7 +380,6 @@ class Cryptography
         return $query;
     }
 
-
     public function mixedToJson($data = NULL, $highlight = FALSE)
     {
         if (is_array($data)) {
@@ -394,64 +396,112 @@ class Cryptography
         return $json;
     }
 
-    function formatMongoOutput($documents)
+
+    public function formatMongoOutput($documents)
     {
-        if ($documents instanceof MongoDB\Model\BSONDocument) {
+        $result = "";
+
+        if (!is_array($documents)) {
             $documents = [$documents];
         }
 
-        $output = "[\n";
-
         foreach ($documents as $doc) {
-            if ($doc instanceof MongoDB\Model\BSONDocument) {
-                $assoc = $doc->getArrayCopy();
-                $output .= "  {\n";
-                foreach ($assoc as $key => $value) {
-                    if ($value instanceof MongoDB\BSON\ObjectId) {
-                        $formattedValue = "ObjectId('" . $value->__toString() . "')";
-                    } elseif (is_string($value)) {
-                        $formattedValue = "'" . $value . "'";
-                    } elseif (is_array($value)) {
-                        $formattedValue = json_encode($value);
-                    } elseif (is_bool($value)) {
-                        $formattedValue = $value ? 'true' : 'false';
-                    } elseif (is_null($value)) {
-                        $formattedValue = 'null';
-                    } else {
-                        $formattedValue = $value;
-                    }
-
-                    $output .= "    $key: $formattedValue,\n";
-                }
-                $output = rtrim($output, ",\n") . "\n";
-                $output .= "  },\n";
-            } else {
-                // Handle string/int/bool/etc.
-                if (is_string($doc)) {
-                    $formattedValue = "'" . $doc . "'";
-                } elseif (is_bool($doc)) {
-                    $formattedValue = $doc ? 'true' : 'false';
-                } elseif (is_null($doc)) {
-                    $formattedValue = 'null';
-                } else {
-                    $formattedValue = $doc;
-                }
-                $output .= "  $formattedValue,\n";
-            }
+            $assoc = $this->objectToArray($doc);
+            $result .= $this->prettyPrint($assoc) . "\n\n"; // Add spacing between documents
         }
 
-        $output = rtrim($output, ",\n") . "\n";
-        $output .= "]";
+        return trim($result);
+    }
+    private function objectToArray($obj)
+    {
+        if ($obj instanceof \MongoDB\Model\BSONDocument) {
+            $arr = [];
+            foreach ($obj->getIterator() as $key => $value) {
+                $arr[$key] = $this->objectToArray($value);
+            }
+            return $arr;
+        } elseif ($obj instanceof \MongoDB\Model\BSONArray) {
+            $arr = [];
+            foreach ($obj as $key => $value) {
+                $arr[$key] = $this->objectToArray($value);
+            }
+            return $arr;
+        }
 
-        return $output;
+        // ⬇️ PRESERVE all scalar BSON types
+        if (
+            $obj instanceof \MongoDB\BSON\ObjectId ||
+            $obj instanceof \MongoDB\BSON\Decimal128 ||
+            $obj instanceof \MongoDB\BSON\Int64 ||
+            $obj instanceof \MongoDB\BSON\UTCDateTime
+        ) {
+            return $obj;
+        }
+
+        if (is_array($obj)) {
+            return array_map([$this, 'objectToArray'], $obj);
+        }
+
+        if (is_object($obj)) {
+            return get_object_vars($obj);
+        }
+
+        return $obj;
     }
 
 
 
-    public function debug($a)
+    private function prettyPrint($data, $indent = 0)
     {
-        echo "<pre>";
-        print_r($a);
-        echo "<pre>";
+        $spaces = str_repeat('  ', $indent);
+        $output = "{\n";
+        foreach ($data as $key => $value) {
+            $output .= $spaces . '  ' . $key . ': ' . $this->formatValue($value, $indent + 1) . ",\n";
+        }
+        $output = rtrim($output, ",\n") . "\n";
+        $output .= $spaces . "}";
+        return $output;
+    }
+
+    private function formatValue($value, $indent = 0)
+    {
+        if ($value instanceof \MongoDB\BSON\ObjectId) {
+            return "ObjectId('" . $value->__toString() . "')";
+        }
+
+        if ($value instanceof \MongoDB\BSON\UTCDateTime) {
+            $isoDate = $value->toDateTime()->format('Y-m-d\TH:i:s.v\Z');
+            return "ISODate('{$isoDate}')";
+        }
+
+        if ($value instanceof \MongoDB\BSON\Decimal128) {
+            return "Decimal128('" . (string)$value . "')";
+        }
+
+        if ($value instanceof \MongoDB\BSON\Int64) {
+            return "Long('" . (string)$value . "')";
+        }
+
+        if (is_array($value)) {
+            return $this->prettyPrint($value, $indent);
+        }
+
+        if (is_object($value)) {
+            return $this->prettyPrint($this->objectToArray($value), $indent);
+        }
+
+        if (is_string($value)) {
+            return "'" . $value . "'";
+        }
+
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+
+        if (is_null($value)) {
+            return 'null';
+        }
+
+        return $value;
     }
 }

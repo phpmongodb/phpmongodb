@@ -16,26 +16,24 @@
                     </tr>
                 </thead>
                 <tbody>
-
                     <?php
-                    if (!empty($this->data['databases']) && is_array($this->data['databases'])) {
-
+                    if (isset($this->data['databases']) && is_array($this->data['databases'])) {
                         foreach ($this->data['databases'] as $db) {
-
                     ?>
                             <tr>
                                 <td><a href="<?php echo Theme::URL('Collection/Index', array('db' => $db['name'])); ?>"><?php echo $db['name']; ?></i></td>
-                                <td>0</td>
+                                <td><?php echo $db['sizeOnDisk']; ?></td>
                                 <?php if (!Application::isReadonly()) { ?>
                                     <td>
-                                        <a href="#myModal" data-db-exist="no" data-edit-db="<?php echo $db['name']; ?>" role="button" data-toggle="modal" class="icon-edit" title="Edit">&nbsp;</a>
-                                        <a href="#myModal" data-db-exist="no" data-delete-db="<?php echo $db['name']; ?>" role="button" data-toggle="modal" class="icon-remove" title="Remove">&nbsp;</a>
+                                        <a href="#myModal" data-db-exist="yes" data-edit-db="<?php echo $db['name']; ?>" role="button" data-toggle="modal" class="icon-edit" title="Edit">&nbsp;</a>
+                                        <a href="#myModal" data-db-exist="yes" data-delete-db="<?php echo $db['name']; ?>" role="button" data-toggle="modal" class="icon-remove" title="Remove">&nbsp;</a>
                                     </td>
                                 <?php } ?>
                             </tr>
                     <?php
                         }
                     }
+
                     ?>
                 </tbody>
             </table>

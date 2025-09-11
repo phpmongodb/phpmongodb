@@ -2,7 +2,7 @@
 
 /**
  * @package PHPmongoDB
- * @version 1.0.0
+ * @version 2.0.0
  * @link http://www.phpmongodb.org
  */
 defined('PMDDA') or die('Restricted access');
@@ -43,16 +43,13 @@ class DatabaseController extends Controller
         $oldDb = urldecode($this->request->getParam('old_db'));
         $dbExist = urldecode($this->request->getParam('db-exist'));
         if (!empty($db) || !empty($oldDb)) {
-            if ($dbExist === 'no') {
-                if ($this->getModel()->updateTemporaryDb($db, $oldDb)) {
-                    $this->message->sucess = I18n::t('D_R_S');
-                }
+
+            $output = $this->getModel()->renameDatabase($oldDb, $db);
+
+            if ($output['success']) {
+                $this->message->sucess = $output['message'];
             } else {
-                $response = $this->getModel()->renameDatabase($oldDb, $db);
-                if ($response['ok'] == 1)
-                    $this->message->sucess = I18n::t('D_R_S');
-                else
-                    $this->message->error = $response;
+                $this->message->error = $output['message'];
             }
         } else {
             $this->message->error = I18n::t('I_D_N');
@@ -69,7 +66,6 @@ class DatabaseController extends Controller
                 $response = $this->getModel()->createDB($db);
                 if ($response['success']) {
                     $this->message->sucess = I18n::t('D_C', $db);
-                    $this->getModel()->saveTemporaryDb($db);
                 } else {
                     $this->message->error = $response['errmsg'];
                 }
@@ -86,19 +82,12 @@ class DatabaseController extends Controller
     {
         $this->isReadonly();
         $db = $this->request->getParam('db');
-        $dbExist = urldecode($this->request->getParam('db-exist'));
         if (!empty($db)) {
-            if ($dbExist === 'no') {
-                if ($this->getModel()->deleteTemporaryDb($db)) {
-                    $this->message->sucess = I18n::t('D_D', $db);
-                }
-            } else {
-                $response = $this->getModel()->dropDatabase($db);
-                if ($response['ok'] == 1)
-                    $this->message->sucess = I18n::t('D_D', $db);
-                else
-                    $this->message->error = $response;
-            }
+            $output = $this->getModel()->dropDatabase($db);
+            if ($output['success'])
+                $this->message->sucess = I18n::t('D_D', $db);
+            else
+                $this->message->error = $output['message'];
         }
         $this->gotoDatabse();
     }
