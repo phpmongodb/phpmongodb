@@ -6,6 +6,30 @@
         </a>
     </div>
 </footer>
+<script>
+    function callAjax(url) {
+        // Append theme false
+        const finalUrl = url + '&theme=false';
+
+        fetch(finalUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not OK');
+                }
+                return response.text();
+            })
+            .then(html => {
+                const middle = document.getElementById('middle-content');
+                if (middle) {
+                    middle.innerHTML = html;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading content:', error);
+            });
+    }
+</script>
+
 </body>
 
 </html>
