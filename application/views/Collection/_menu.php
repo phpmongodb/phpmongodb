@@ -37,7 +37,9 @@
     <!-- Browse -->
     <a href="javascript:void(0)"
         @click="activeTab = 'record'; callAjax('<?php echo Theme::URL('Collection/Record', ['db' => $this->db, 'collection' => $this->collection]); ?>')"
-        :class="activeTab === 'record' ? 'px-3 py-1 rounded border text-sm bg-green-600 text-white' : 'px-3 py-1 rounded border text-sm bg-blue-600 text-white hover:bg-blue-700'">
+        :class="activeTab === 'record' 
+            ? 'px-3 py-1 rounded border text-sm bg-green-600 text-white' 
+            : 'px-3 py-1 rounded border text-sm bg-gray-100 text-gray-700 hover:bg-gray-200'">
         <?php I18n::p('BROWSE'); ?>
     </a>
 
@@ -45,7 +47,9 @@
         <!-- Insert -->
         <a href="javascript:void(0)"
             @click="activeTab = 'insert'; callAjax('<?php echo Theme::URL('Collection/Insert', ['db' => $this->db, 'collection' => $this->collection]); ?>')"
-            :class="activeTab === 'insert' ? 'px-3 py-1 rounded border text-sm bg-green-600 text-white' : 'px-3 py-1 rounded border text-sm bg-blue-600 text-white hover:bg-blue-700'">
+            :class="activeTab === 'insert' 
+                ? 'px-3 py-1 rounded border text-sm bg-green-600 text-white' 
+                : 'px-3 py-1 rounded border text-sm bg-gray-100 text-gray-700 hover:bg-gray-200'">
             <?php I18n::p('INSERT'); ?>
         </a>
     <?php } ?>
@@ -53,7 +57,9 @@
     <!-- Export -->
     <a href="javascript:void(0)"
         @click="activeTab = 'export'; callAjax('<?php echo Theme::URL('Collection/Export', ['db' => $this->db, 'collection' => $this->collection]); ?>')"
-        :class="activeTab === 'export' ? 'px-3 py-1 rounded border text-sm bg-green-600 text-white' : 'px-3 py-1 rounded border text-sm bg-blue-600 text-white hover:bg-blue-700'">
+        :class="activeTab === 'export' 
+            ? 'px-3 py-1 rounded border text-sm bg-green-600 text-white' 
+            : 'px-3 py-1 rounded border text-sm bg-gray-100 text-gray-700 hover:bg-gray-200'">
         <?php I18n::p('EXPORT'); ?>
     </a>
 
@@ -61,7 +67,9 @@
         <!-- Import -->
         <a href="javascript:void(0)"
             @click="activeTab = 'import'; callAjax('<?php echo Theme::URL('Collection/Import', ['db' => $this->db, 'collection' => $this->collection]); ?>')"
-            :class="activeTab === 'import' ? 'px-3 py-1 rounded border text-sm bg-green-600 text-white' : 'px-3 py-1 rounded border text-sm bg-blue-600 text-white hover:bg-blue-700'">
+            :class="activeTab === 'import' 
+                ? 'px-3 py-1 rounded border text-sm bg-green-600 text-white' 
+                : 'px-3 py-1 rounded border text-sm bg-gray-100 text-gray-700 hover:bg-gray-200'">
             <?php I18n::p('IMPORT'); ?>
         </a>
     <?php } ?>
@@ -69,14 +77,18 @@
     <!-- Indexes -->
     <a href="javascript:void(0)"
         @click="activeTab = 'indexes'; callAjax('<?php echo Theme::URL('Collection/Indexes', ['db' => $this->db, 'collection' => $this->collection]); ?>')"
-        :class="activeTab === 'indexes' ? 'px-3 py-1 rounded border text-sm bg-green-600 text-white' : 'px-3 py-1 rounded border text-sm bg-blue-600 text-white hover:bg-blue-700'">
+        :class="activeTab === 'indexes' 
+            ? 'px-3 py-1 rounded border text-sm bg-green-600 text-white' 
+            : 'px-3 py-1 rounded border text-sm bg-gray-100 text-gray-700 hover:bg-gray-200'">
         <?php I18n::p('INDEXES'); ?>
     </a>
 
     <!-- Search -->
     <a href="javascript:void(0)"
         @click="activeTab = 'search'; callAjax('<?php echo Theme::URL('Collection/Search', ['db' => $this->db, 'collection' => $this->collection]); ?>')"
-        :class="activeTab === 'search' ? 'px-3 py-1 rounded border text-sm bg-green-600 text-white' : 'px-3 py-1 rounded border text-sm bg-blue-600 text-white hover:bg-blue-700'">
+        :class="activeTab === 'search' 
+            ? 'px-3 py-1 rounded border text-sm bg-green-600 text-white' 
+            : 'px-3 py-1 rounded border text-sm bg-gray-100 text-gray-700 hover:bg-gray-200'">
         <?php I18n::p('SEARCH'); ?>
     </a>
 </div>

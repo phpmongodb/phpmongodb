@@ -30,7 +30,7 @@
         <div class="max-w-full mx-auto px-6 py-3 flex items-center justify-between">
             <!-- Brand -->
             <a href="<?php echo Theme::getHome(); ?>" class="text-xl font-semibold tracking-wide">
-                <span class="text-gray-300 italic">PHP</span> <span class="font-bold">{ mongoDB }</span>
+                { <span class="text-gray-300 italic">PHP</span> <span class="font-bold"> mongoDB </span>}
             </a>
 
             <!-- Nav Menu -->

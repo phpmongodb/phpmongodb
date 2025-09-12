@@ -13,10 +13,9 @@
 
     <!-- Small reference -->
     <small class="text-sm text-green-100 hidden sm:inline font-mono">
-        show collections
+        <?php I18n::p('S_C'); ?>
     </small>
 </div>
-
 
 <div class="flex flex-wrap gap-6">
     <!-- Collections List -->
@@ -40,7 +39,7 @@
                     <tr>
                         <th class="px-3 py-2 text-left"><?php I18n::p('NAME'); ?></th>
                         <th class="px-3 py-2 text-left"><?php I18n::p('T_C'); ?></th>
-                        <th class="px-3 py-2 text-center">&nbsp;</th>
+                        <th class="px-3 py-2 text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -61,30 +60,35 @@
 
                             <!-- Actions -->
                             <?php if (!Application::isReadonly()) { ?>
-                                <td class="px-3 py-2 text-center flex items-center justify-center gap-3">
-                                    <!-- Edit -->
-                                    <button
-                                        @click="$dispatch('open-modal', { type: 'edit-collection', collection: '<?php echo $collection['name']; ?>' })"
-                                        class="text-blue-600 hover:text-blue-800"
-                                        title="Edit">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4"
-                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L7.5 21H3v-4.5L16.732 3.732z" />
-                                        </svg>
-                                    </button>
+                                <td class="px-3 py-2 text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <!-- Rename -->
+                                        <button
+                                            @click="$dispatch('open-modal', { type: 'edit-collection', collection: '<?php echo $collection['name']; ?>' })"
+                                            class="inline-flex items-center gap-1 px-2 py-1 border border-gray-300 text-gray-700 rounded hover:bg-gray-100 transition"
+                                            title="Rename Collection">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                class="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036
+                                                       a2.5 2.5 0 113.536 3.536L7.5 21H3v-4.5L16.732 3.732z" />
+                                            </svg>
+                                            <span class="hidden sm:inline text-sm"> <?php I18n::p('RENAME'); ?></span>
+                                        </button>
 
-                                    <!-- Delete -->
-                                    <button
-                                        @click="$dispatch('open-modal', { type: 'delete-collection', collection: '<?php echo $collection['name']; ?>' })"
-                                        class="text-red-600 hover:text-red-800"
-                                        title="Remove">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4"
-                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </button>
+                                        <!-- Delete -->
+                                        <button
+                                            @click="$dispatch('open-modal', { type: 'delete-collection', collection: '<?php echo $collection['name']; ?>' })"
+                                            class="inline-flex items-center gap-1 px-2 py-1 border border-red-300 text-red-600 rounded hover:bg-red-50 transition"
+                                            title="Delete Collection">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                class="w-4 h-4 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                            <span class="hidden sm:inline text-sm"><?php I18n::p('DELETE'); ?></span>
+                                        </button>
+                                    </div>
                                 </td>
                             <?php } ?>
                         </tr>

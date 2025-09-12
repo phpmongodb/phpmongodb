@@ -69,9 +69,11 @@
             </table>
 
             <div>
-                <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                <!-- Save Button (MongoDB style) -->
+                <button class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 focus:ring-2 focus:ring-green-400">
                     <?php I18n::p('SAVE'); ?>
                 </button>
+
             </div>
 
             <input type="hidden" name="load" value="Collection/SaveRecord" />

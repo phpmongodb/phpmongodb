@@ -45,6 +45,7 @@ $language = array(
     'PHP_V' => 'PHP version',
     'MONGODB_V' => 'MongoDB Version',
     'B_I' => 'Build Information',
+    'S_C' => 'show collections',
     //application/views/Database/index.php
     'NAME' => 'Name',
     'S_O_D' => 'size On Disk',
@@ -52,6 +53,7 @@ $language = array(
     'SAVE' => 'Save',
     'CANCEL' => 'Cancel',
     'DELETE' => 'Delete',
+    'RENAME' => 'Rename',
     'DEL_C' => 'Delete Confirmation',
     'A_Y_W_T_D_D' => 'Are you want to delete database ?',
     //application/views/Collection/_insert.php
@@ -61,6 +63,7 @@ $language = array(
     'ADD' => 'Add',
     'REMOVE' => 'Remove',
     'EDIT' => 'Edit',
+    'A_Y_W_T_D_C'  => 'Are you want to delete collection ?',
     //application/views/Collection/_menu.php
     'BROWSE' => 'Browse',
     'INSERT' => 'Insert',
