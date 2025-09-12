@@ -449,10 +449,13 @@ class Formatter
         return $obj;
     }
 
-
-
     private function prettyPrint($data, $indent = 0)
     {
+        if (!is_array($data) && !is_object($data)) {
+            // agar string, number, bool etc. hai → direct return
+            return $this->formatValue($data, $indent);
+        }
+
         $spaces = str_repeat('  ', $indent);
         $output = "{\n";
         foreach ($data as $key => $value) {

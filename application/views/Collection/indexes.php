@@ -28,30 +28,39 @@
             if (isset($this->data['indexes']) && is_array($this->data['indexes'])) {
                 foreach ($this->data['indexes'] as $index) {
             ?>
-                    <div class="mb-6 border rounded bg-gray-50">
-                        <div class="bg-gray-100 border-b px-3 py-2 font-semibold">Index Details</div>
-                        <table class="w-full text-sm border-collapse">
-                            <tbody class="divide-y">
+                    <div class="mb-6 bg-white shadow rounded-lg overflow-hidden border border-gray-200">
+                        <!-- Card Header -->
+                        <div class="bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-800 border-b">
+                            📑 Index Details
+                        </div>
+
+                        <!-- Table -->
+                        <table class="w-full text-sm">
+                            <tbody class="divide-y divide-gray-200">
                                 <?php
                                 foreach ($index as $key => $value) {
                                     echo '<tr class="hover:bg-gray-50">';
-                                    echo '<td class="px-3 py-2 font-medium text-gray-700 w-1/4">' . htmlspecialchars($key) . '</td>';
-                                    echo '<td class="px-3 py-2">';
+                                    echo '<td class="px-4 py-2 w-1/4 bg-gray-50 font-medium text-gray-700">' . htmlspecialchars($key) . '</td>';
+                                    echo '<td class="px-4 py-2">';
                                     if (is_array($value)) {
-                                        echo '<pre class="bg-gray-100 p-2 rounded border text-xs overflow-x-auto">' .
+                                        echo '<pre class="bg-gray-900 text-green-300 p-3 rounded text-xs overflow-x-auto border border-gray-700">' .
                                             $this->data['formatter']->highlight($this->data['formatter']->arrayToJSON($value)) .
                                             '</pre>';
                                     } else {
-                                        echo htmlspecialchars((string)$value);
+                                        echo '<span class="text-gray-800">' . htmlspecialchars((string)$value) . '</span>';
                                     }
                                     echo '</td>';
                                     echo '</tr>';
                                 }
+
+                                // Action Row
                                 if (!Application::isReadonly() && isset($index['name']) && $index['name'] !== '_id_') {
                                     echo '<tr>';
-                                    echo '<td class="px-3 py-2 font-medium text-gray-700">Action</td>';
-                                    echo '<td class="px-3 py-2">';
-                                    echo '<a href="' . Theme::URL('Collection/DeleteIndexes', array('db' => $this->db, 'collection' => $this->collection, 'name' => $index['name'])) . '" class="text-red-600 hover:underline">Delete</a>';
+                                    echo '<td class="px-4 py-2 bg-gray-50 font-medium text-gray-700">Action</td>';
+                                    echo '<td class="px-4 py-2">';
+                                    echo '<a href="' . Theme::URL('Collection/DeleteIndexes', array('db' => $this->db, 'collection' => $this->collection, 'name' => $index['name'])) . '" ';
+                                    echo 'class="inline-block px-3 py-1 text-red-600 border border-red-600 rounded hover:bg-red-600 hover:text-white transition">';
+                                    echo 'Delete</a>';
                                     echo '</td>';
                                     echo '</tr>';
                                 }

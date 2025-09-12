@@ -13,8 +13,6 @@ class ServerController extends Controller
     public function Execute()
     {
 
-
-
         $return = [];
         $model = new Database();
         if ($this->request->isPost()) {
