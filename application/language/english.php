@@ -55,7 +55,7 @@ $language = array(
     'DEL_C' => 'Delete Confirmation',
     'A_Y_W_T_D_D' => 'Are you want to delete database ?',
     //application/views/Collection/_insert.php
-    'F_V' => 'Field Value',
+    'F_V' => 'Fields and Values',
     'FIELD' => 'Field',
     'VALUE' => 'Value',
     'ADD' => 'Add',
@@ -112,6 +112,7 @@ $language = array(
     'U_S' => 'Updated successfully.',
     'R_S_D' => 'Record successfully deleted',
     'R_I' => ' Record inserted',
+    'D_I_S' => 'Document inserted successfully.',
     'I_J' => 'Invalid JSON',
     'E_F_N_A_V' => 'Enter Field Name and Value',
     'Y_C_N_U_C_F_C_N' => 'You can not use characters /\. "*<>:|? for collection name',

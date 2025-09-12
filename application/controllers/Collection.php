@@ -189,7 +189,7 @@ class CollectionController extends Controller
         ]));
     }
 
-    protected function getQuery($query = array())
+    protected function getQuery($query = [])
     {
         $formatter = new Formatter();
         for ($ind = 0; $ind < count($query); $ind += 3) {
@@ -219,19 +219,37 @@ class CollectionController extends Controller
 
     public function getSort($orderBy, $orders)
     {
-        $sort = false;
-        if ($orderBy) {
+        // initialize as array instead of false
+        $sort = [];
+
+        if ($orderBy && is_array($orderBy)) {
             $total = count($orderBy);
+
             for ($i = 0; $i < $total; $i++) {
                 if (!isset($orderBy[$i]) || empty($orderBy[$i])) {
                     continue;
                 }
-                $sort[$orderBy[$i]] = (int) $orders[$i];
+
+                // sanitize field name (allow only letters, numbers, underscore, dot)
+                $field = preg_replace('/[^A-Za-z0-9_.]/', '', $orderBy[$i]);
+
+                // skip if invalid field name
+                if ($field === '') {
+                    continue;
+                }
+
+                // normalize order (only allow 1 or -1)
+                $order = isset($orders[$i]) && (int)$orders[$i] === -1 ? -1 : 1;
+
+                $sort[$field] = $order;
             }
-        } else {
-            //default sort order by DESC
+        }
+
+        // default sort if nothing valid
+        if (empty($sort)) {
             $sort['_id'] = -1;
         }
+
         return $sort;
     }
 
@@ -245,8 +263,8 @@ class CollectionController extends Controller
             $skip = $this->request->getParam('start', 0);
             $limit = $this->request->getParam('limit', 10);
             $type = strtolower($this->request->getParam('type', 'array'));
-            $query = array();
-            $fields = array();
+            $query = [];
+            $fields = [];
 
             if ($this->request->getParam('search', false) && $this->request->getParam('query', false)) {
                 switch ($type) {
@@ -425,7 +443,7 @@ class CollectionController extends Controller
 
             $response = $this->getModel()->insert($this->db, $this->collection, $document);
             if ($response['success']) {
-                $this->message->sucess = count($document) . I18n::t('R_I');
+                $this->message->sucess = count($document) . I18n::t('D_I_S');
             } else {
                 $this->message->error = $response['message'];
             }
