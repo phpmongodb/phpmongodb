@@ -1,6 +1,19 @@
 <!-- Page Header -->
-<div class="bg-gray-100 border-b border-gray-300 py-4 px-6 mb-4">
-    <h1 class="text-xl font-semibold text-gray-800"><?php I18n::p('DB'); ?></h1>
+<div class="bg-green-600 text-white py-4 px-6 mb-4 flex items-center justify-between rounded">
+    <h1 class="text-xl font-semibold flex items-center gap-2">
+        <!-- Database Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 3c-4.97 0-9 1.79-9 4v10c0 2.21 4.03 4 9 4s9-1.79 9-4V7c0-2.21-4.03-4-9-4z" />
+        </svg>
+        <?php I18n::p('DB'); ?>
+    </h1>
+
+    <!-- Small reference -->
+    <small class="text-sm text-green-100 hidden sm:inline font-mono">
+        show databases
+    </small>
 </div>
 
 <div class="flex flex-wrap gap-6">

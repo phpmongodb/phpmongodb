@@ -5,16 +5,30 @@
 <?php } ?>
 
 <!-- Page Header -->
-<div class="bg-gray-100 border-b border-gray-300 py-4 px-6 mb-4">
-    <h1 class="text-xl font-semibold text-gray-800 flex items-center gap-2">
+<div class="bg-green-600 text-white py-4 px-6 mb-4 flex items-center justify-between rounded">
+    <h1 class="text-xl font-semibold flex items-center gap-2">
+        <!-- Collection Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+
+        <!-- DB / Collection Path -->
         <a href="<?php echo Theme::URL('Collection/Index', ['db' => $this->db]); ?>"
-            class="text-green-700 hover:underline">
+            class="text-green-100 hover:underline">
             <?php echo $this->db; ?>
         </a>
-        <span class="text-gray-500">/</span>
-        <span class="text-gray-700"><?php echo $this->collection; ?></span>
+        <span class="text-green-200">/</span>
+        <span class="font-mono"><?php echo $this->collection; ?></span>
     </h1>
+
+    <!-- Right Side Hint -->
+    <small class="text-sm text-green-100 hidden sm:inline font-mono">
+        db.<?php echo $this->collection; ?>.find()
+    </small>
 </div>
+
 
 <!-- Toolbar with Alpine state -->
 <div class="flex flex-wrap gap-2 mb-4"
