@@ -1,25 +1,54 @@
-# PHPMongoDB
+# 🐘 PHPMongoDB
 
-A simple and lightweight administrative tool for MongoDB over the web.
+A simple and lightweight **web-based administrative tool for MongoDB**, built in PHP.  
+Manage **databases, collections, and documents** directly from your browser.
 
-## License
+---
 
-This project is licensed under the MIT License.
+## 📜 License
+This project is licensed under the **MIT License**.
 
-## Introduction
+---
 
-PHPMongoDB is a web-based administrative tool for MongoDB. It provides a user-friendly interface to manage your databases, collections, and documents directly from your web browser.
+## 🚀 Features
+- Clean web UI to browse databases & collections
+- Insert, update, and delete documents
+- Export & import collections
+- Uses the official MongoDB PHP driver
+- Lightweight, simple, and fast
 
+---
 
+## 📦 Manual Installation
 
-## Installation
+### Step 1: Install the MongoDB PHP Driver
+```bash
+pecl install mongodb
+# Enable the extension (adds to your loaded php.ini)
+echo "extension=mongodb.so" | sudo tee -a "$(php --ini | grep 'Loaded Configuration' | sed -E 's|.*:\s*||')"
+```
 
-1.  Ensure you have a PHP, web server (like Apache or NGINX) installed and configured.
-    
-2.  Install the official MongoDB PHP driver.
-    
-3.  Download the project from the `beta` branch on GitHub, or clone it using: `git clone https://github.com/phpmongodb/phpmongodb.git`
+### Verify it’s loaded
+```bash
+php -m | grep mongodb
+```
 
-*You can get support and suggestions by writing to us at  nanhe.kumar@gmail.com*
+### Step 2: Get the Code
+```bash
+git clone https://github.com/phpmongodb/phpmongodb.git
+cd phpmongodb
+```
 
-.
+### Step 3: Install PHP Dependencies
+```bash
+composer install --no-dev --optimize-autoloader
+```
+
+### Step 4: Serve the App
+```bash
+php -S 0.0.0.0:8080 -t .
+```
+
+### Access in browser
+Open: <http://localhost:8080>
+
