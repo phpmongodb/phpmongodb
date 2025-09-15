@@ -1,109 +1,119 @@
 <?php
 
-class CHttp {
+class CHttp
+{
+    protected bool $XSS = true;
 
-    protected $XSS=TRUE;
-    
-    public function onXSS(){
-        $this->XSS=TRUE;
+    public function onXSS(): void
+    {
+        $this->XSS = true;
     }
-    public function offXSS(){
-        $this->XSS=FALSE;
-    }
-    /**
 
-     * @return string request type, such as GET, POST, HEAD.
-     * @author Nanhe Kumar <nanhe.kumar@gmail.com>
-     */
-    public function getType() {
-        return strtoupper(isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET');
+    public function offXSS(): void
+    {
+        $this->XSS = false;
     }
 
     /**
-     * Returns whether this is a POST request.
-     * @return boolean whether this is a POST request.
-     * @author Nanhe Kumar <nanhe.kumar@gmail.com>
+     * Get request type (GET, POST, HEAD, etc.)
      */
-    public function isPost() {
-        return isset($_SERVER['REQUEST_METHOD']) && !strcasecmp($_SERVER['REQUEST_METHOD'], 'POST');
+    public function getType(): string
+    {
+        return strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
     }
 
     /**
-     * Returns whether this is an AJAX (XMLHttpRequest) request.
-     * @return boolean whether this is an AJAX (XMLHttpRequest) request.
-     * @author Nanhe Kumar <nanhe.kumar@gmail.com>
+     * Check if request is POST
      */
-    public function isAjax() {
-        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
+    public function isPost(): bool
+    {
+        return isset($_SERVER['REQUEST_METHOD']) && strcasecmp($_SERVER['REQUEST_METHOD'], 'POST') === 0;
     }
 
     /**
-     * Returns the named GET or POST parameter value.
-     * If the GET or POST parameter does not exist, the second parameter to this method will be returned.
-     * If both GET and POST contains such a named parameter, the GET parameter takes precedence.
-     * @param string $name the GET parameter name
-     * @param mixed $value the default parameter value if the GET parameter does not exist.
-     * @return mixed the GET parameter value
-
+     * Check if request is AJAX
      */
-    public function getParam($name, $value = null) {
-        $param= isset($_GET[$name]) ? $_GET[$name] : (isset($_POST[$name]) ? $_POST[$name] : $value);
-        if($this->XSS && is_string($param)){
-            $param=strip_tags($param);
+    public function isAjax(): bool
+    {
+        return ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'XMLHttpRequest';
+    }
+
+    /**
+     * Get request param (GET has higher priority over POST)
+     */
+    public function getParam(string $name, mixed $default = null): mixed
+    {
+        $param = $_GET[$name] ?? $_POST[$name] ?? $default;
+
+        if ($this->XSS && is_string($param)) {
+            $param = strip_tags($param);
         }
         return $param;
     }
 
     /**
-     * Returns the named GET parameter value.
-     * If the GET parameter does not exist, the second parameter to this method will be returned.
-     * @param string $name the GET parameter name
-     * @param mixed $value the default parameter value if the GET parameter does not exist.
-     * @return mixed the GET parameter value
-
+     * Get GET param
      */
-    public function getQuery($name, $value = null) {
-        return isset($_GET[$name]) ? $_GET[$name] : $value;
+    public function getQuery(string $name, mixed $default = null): mixed
+    {
+        return $_GET[$name] ?? $default;
     }
 
     /**
-     * Returns the named POST parameter value.
-     * If the POST parameter does not exist, the second parameter to this method will be returned.
-     * @param string $name the POST parameter name
-     * @param mixed $value the default parameter value if the POST parameter does not exist.
-     * @return mixed the POST parameter value
-
+     * Get POST param
      */
-    public function getPost($name, $value = null) {
-        return isset($_POST[$name]) ? $_POST[$name] : $value;
+    public function getPost(string $name, mixed $default = null): mixed
+    {
+        return $_POST[$name] ?? $default;
     }
 
     /**
-     * Returns part of the request URL that is after the question mark.
-     * @return string part of the request URL that is after the question mark
+     * Get raw query string
      */
-    public function getQueryString() {
-        return isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : '';
+    public function getQueryString(): string
+    {
+        return $_SERVER['QUERY_STRING'] ?? '';
     }
 
     /**
-     * Redirects the browser to the specified URL.
-     * @param string $url URL to be redirected to. Note that when URL is not
-     * absolute (not starting with "/") it will be relative to current request URL.
-     * @param boolean $terminate whether to terminate the current application
-     * @param integer $statusCode the HTTP status code. Defaults to 302. See {@link http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html}
-     * for details about HTTP status code.
+     * Redirect to given URL
      */
-    public function redirect($url, $terminate = true, $statusCode = 302) {
-        if (strpos($url, '/') === 0 && strpos($url, '//') !== 0)
+    public function redirect(?string $url, bool $terminate = true, int $statusCode = 302): void
+    {
+        $url = trim($url ?? '');
+
+        if ($url === '') {
+            // Agar URL missing ho → fallback home
+            $url = $this->getHost() . '/';
+        }
+
+        // Handle relative URLs like "/dashboard"
+        if (str_starts_with($url, '/') && !str_starts_with($url, '//')) {
             $url = $this->getHost() . $url;
+        }
+
         header('Location: ' . $url, true, $statusCode);
-        if ($terminate)
+
+        if ($terminate) {
             exit();
+        }
     }
-    public function serverSoftware(){
-        return $_SERVER['SERVER_SOFTWARE'];
+
+    /**
+     * Get server software
+     */
+    public function serverSoftware(): string
+    {
+        return $_SERVER['SERVER_SOFTWARE'] ?? 'unknown';
+    }
+
+    /**
+     * Get host URL (scheme + domain + port)
+     */
+    private function getHost(): string
+    {
+        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
+        $host   = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
+        return $scheme . "://" . $host;
     }
 }
-
-?>

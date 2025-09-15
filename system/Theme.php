@@ -121,40 +121,49 @@ class Theme
         return $url;
     }
 
+
     public static function pagination($total = 0, $split = 10)
     {
         $url = self::currentURL(TRUE);
-        $current = (isset($_GET['start']) ? $_GET['start'] : 0);
+        $start = (isset($_GET['start']) ? intval($_GET['start']) : 0);
 
+        $current = floor($start / $split); // Current page
+        $end = ceil($total / $split);     // Total pages
 
-        if ($total > $split && $current < $total) {
-            $current = ($current >= $split ? ceil($current / $split) : 0);
-            $page = 0;
-            $end = ceil($total / $split);
-            if ($total > $split) {
+        if ($total > $split) {
+            $page = max(0, $current - 3); // Start page range
+            $last = min($end, $page + 7); // End page range
 
-                if ($current > 5) {
-                    $page = $current - 5;
-                }
-                if (($page + $split) <= $end) {
-                    $end = $page + $split;
-                }
+            echo '<div x-data class="mt-6 flex items-center justify-center">';
+            echo '<nav class="inline-flex rounded-md shadow-sm border border-gray-200 bg-white" aria-label="Pagination">';
+
+            // Prev Button
+            if ($current > 0) {
+                echo '<a href="' . self::paginationURL($url, ($current - 1) * $split) . '" 
+                    class="px-3 py-2 border-r border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50">
+                    Prev
+                  </a>';
             }
 
-            echo '<div class="pagination">';
-            echo '<ul>';
-            if ($current != 0) {
-                echo '<li><a href="' . self::paginationURL($url, (($current - 1) * $split)) . '">Prev</a></li>';
+            // Page Numbers
+            for (; $page < $last; $page++) {
+                $isActive = ($current == $page);
+                echo '<a href="' . (!$isActive ? self::paginationURL($url, $page * $split) : 'javascript:void(0)') . '" 
+                    class="px-3 py-2 text-sm font-medium border-r border-gray-200 '
+                    . ($isActive ? 'bg-green-600 text-white' : 'text-gray-700 hover:bg-gray-50') . '">
+                    ' . ($page + 1) . '
+                  </a>';
             }
 
+            // Next Button
+            if (($current + 1) * $split < $total) {
+                echo '<a href="' . self::paginationURL($url, ($current + 1) * $split) . '" 
+                    class="px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">
+                    Next
+                  </a>';
+            }
 
-            for (; $page < $end; $page++) {
-                echo '<li class="' . ($current == $page ? "active" : "") . '"><a href="' . ($current != $page ? self::paginationURL($url, ($page * $split)) : 'javascript:void(0)') . '" >' . ($page + 1) . '</a></li>';
-            }
-            if ((($current * $split) + $split) < $total) {
-                echo '<li><a href="' . self::paginationURL($url, (($current + 1) * $split)) . '">Next</a></li>';
-            }
-            echo '</ul>';
+            echo '</nav>';
             echo '</div>';
         }
     }

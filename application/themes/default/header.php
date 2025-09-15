@@ -56,8 +56,7 @@
                         class="absolute right-0 mt-2 bg-white text-gray-800 rounded shadow w-36 z-50">
                         <?php foreach (Widget::get('languageList') as $key => $val): ?>
                             <li>
-                                <a href="<?php echo Theme::URL('Index/SetLanguage', ['language' => $key]); ?>"
-                                    class="block px-4 py-2 hover:bg-gray-100">
+                                <a href="<?php echo Theme::URL('Index/SetLanguage', ['language' => $key]); ?>" class="block px-4 py-2 hover:bg-gray-100">
                                     <?php echo $val; ?>
                                 </a>
                             </li>

@@ -88,11 +88,24 @@ class Collection extends Model
     public function dropCollection($db, $collection)
     {
         try {
-            return $this->client->selectDatabase($db)->selectCollection($collection)->drop();
+            $result = $this->client
+                ->selectDatabase($db)
+                ->selectCollection($collection)
+                ->drop();
+
+            return [
+                'success' => true,
+                'message' => "Collection '{$collection}' dropped successfully.",
+                'result'  => $result
+            ];
         } catch (Exception $e) {
-            exit($e->getMessage());
+            return [
+                'success' => false,
+                'message' => $e->getMessage()
+            ];
         }
     }
+
 
     public function totalRecord($db, $collection, $query = false, $format = 'array')
     {

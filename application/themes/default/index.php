@@ -8,11 +8,20 @@
     $success = isset(View::getMessage()->sucess);
     $error = isset(View::getMessage()->error);
     ?>
-    <?php if ($success || $error): ?>
-        <div class="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded relative mb-4">
-            <strong class="font-bold">Note:</strong>
+    <?php if ($success): ?>
+        <!-- Success Alert -->
+        <div class="bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded relative mb-4">
+            <strong class="font-bold">Success:</strong>
             <span class="block sm:inline">
-                <?php echo $error ? View::getMessage()->error : View::getMessage()->sucess; ?>
+                <?php echo View::getMessage()->sucess; ?>
+            </span>
+        </div>
+    <?php elseif ($error): ?>
+        <!-- Error Alert -->
+        <div class="bg-red-100 border border-red-400 text-red-800 px-4 py-3 rounded relative mb-4">
+            <strong class="font-bold">Error:</strong>
+            <span class="block sm:inline">
+                <?php echo View::getMessage()->error; ?>
             </span>
         </div>
     <?php endif; ?>

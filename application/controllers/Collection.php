@@ -260,8 +260,8 @@ class CollectionController extends Controller
         $formatter = new Formatter();
         if ($this->validation($this->db, $this->collection)) {
             $record = array();
-            $skip = $this->request->getParam('start', 0);
-            $limit = $this->request->getParam('limit', 10);
+            $skip = (int)$this->request->getParam('start', 0);
+            $limit = (int)$this->request->getParam('limit', 10);
             $type = strtolower($this->request->getParam('type', 'array'));
             $query = [];
             $fields = [];
@@ -284,7 +284,12 @@ class CollectionController extends Controller
             }
             if (!$this->isError()) {
                 $ordeBy = $this->getSort($this->request->getParam('order_by', false), $this->request->getParam('orders', false));
-                $cursor = $this->getModel()->find($this->db, $this->collection, $query, $fields, $limit, $skip, $type, $ordeBy);
+                $ouptput = $this->getModel()->find($this->db, $this->collection, $query, $fields, $limit, $skip, $type, $ordeBy);
+                if (! $ouptput['success']) {
+                    $this->message->error = $ouptput['message'];
+                    $this->request->redirect($this->url);
+                }
+
                 if ($type == 'json') {
                     $total = $this->getModel()->totalRecord($this->db, $this->collection, $query, $type);
                 } else {
@@ -292,7 +297,7 @@ class CollectionController extends Controller
                     $total = $this->getModel()->countDocuments($this->db, $this->collection, $query);
                 }
 
-                $record = $formatter->decode($cursor, $type);
+                $record = $formatter->decode($ouptput['data'], $type);
             }
             $this->application->view = 'Collection';
             $format = array('json', 'array', 'document', 'jsonv2');
@@ -547,14 +552,15 @@ class CollectionController extends Controller
         $this->setDB();
         $this->setCollection();
         if ($this->validation($this->db, $this->collection)) {
-            $response = $this->getModel()->dropCollection($this->db, $this->collection);
-            if ($response['ok'] == '1') {
+            $result = $this->getModel()->dropCollection($this->db, $this->collection);
+            if ($result['success']) {
                 $this->message->sucess = I18n::t('C_D', $this->collection);
             } else {
-                $this->message->error = $response['errmsg'];
+                $this->message->error = $result['message'];
             }
             $this->url = Theme::URL('Collection/Index', array('db' => $this->db));
         }
+
         $this->request->redirect($this->url);
     }
 
@@ -564,7 +570,7 @@ class CollectionController extends Controller
         $this->setDB();
         $this->setCollection();
         if ($this->validation($this->db, $this->collection)) {
-            $response = $this->getModel()->removeCollection($this->db, $this->collection);
+            $result = $this->getModel()->removeCollection($this->db, $this->collection);
             $this->message->sucess = I18n::t('C_R', $this->collection);
             $this->url = Theme::URL('Collection/Index', array('db' => $this->db));
         }

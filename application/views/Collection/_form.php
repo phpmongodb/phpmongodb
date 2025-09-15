@@ -25,14 +25,14 @@
             <!-- Header -->
             <div class="flex justify-between items-center border-b pb-2 mb-4">
                 <h3 class="text-lg font-semibold text-gray-800"
-                    x-text="mode === 'edit' ? 'Edit Collection' : 'Delete Collection'"></h3>
+                    x-text="mode === 'edit' ? 'Rename Collection' : 'Delete Collection'"></h3>
                 <button type="button" @click="open=false"
                     class="text-gray-400 hover:text-gray-600">×</button>
             </div>
 
             <!-- Body -->
             <div class="mb-4">
-                <!-- Edit Mode -->
+                <!-- Rename Mode -->
                 <template x-if="mode === 'edit'">
                     <input type="text" name="collection" x-model="collection"
                         class="w-full border rounded px-3 py-2" required>
@@ -73,7 +73,16 @@
             <!-- Hidden Fields -->
             <input type="hidden" name="load" :value="load">
             <input type="hidden" name="db" value="<?php echo $this->db; ?>">
-            <input type="hidden" name="old_collection" :value="oldCollection">
+
+            <!-- Rename case: old_collection -->
+            <template x-if="mode === 'edit'">
+                <input type="hidden" name="old_collection" :value="oldCollection">
+            </template>
+
+            <!-- Delete case: collection -->
+            <template x-if="mode === 'delete'">
+                <input type="hidden" name="collection" :value="collection">
+            </template>
         </form>
     </div>
 </div>

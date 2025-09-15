@@ -94,17 +94,28 @@ class Model
         try {
             $options = [
                 'projection' => $fields,
-                'limit' => $limit,
-                'skip' => $skip,
-                'sort' => $orderBy
+                'limit'      => $limit,
+                'skip'       => $skip,
+                'sort'       => $orderBy
             ];
 
             $cursor = $this->client->selectCollection($db, $collection)->find($query, $options);
-            return iterator_to_array($cursor);
+
+            $data = iterator_to_array($cursor);
+
+            return [
+                'success' => true,
+                'data'    => $data,
+                'count'   => count($data)
+            ];
         } catch (Exception $e) {
-            exit($e->getMessage());
+            return [
+                'success' => false,
+                'message' => $e->getMessage()
+            ];
         }
     }
+
 
     public function insert($db, $collection, $document = [], $format = 'array', $options = [])
     {
