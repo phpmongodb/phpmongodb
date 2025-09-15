@@ -14,8 +14,13 @@
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-    <!-- Favicon -->
-    <link rel="icon" href="<?php echo Theme::getPath(); ?>images/favicon.ico" type="image/x-icon" />
+    <!-- PNG fallbacks -->
+    <link rel="icon" type="image/png" sizes="16x16" href="<?php echo Theme::getPath(); ?>images/favicon-16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?php echo Theme::getPath(); ?>images/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="<?php echo Theme::getPath(); ?>images/favicon-48.png">
+    <link rel="icon" type="image/png" sizes="64x64" href="<?php echo Theme::getPath(); ?>images/favicon-64.png">
+    <link rel="icon" type="image/png" sizes="128x128" href="<?php echo Theme::getPath(); ?>images/favicon-128.png">
+    <link rel="icon" type="image/png" sizes="256x256" href="<?php echo Theme::getPath(); ?>images/favicon-256.png">
 
     <style>
         [x-cloak] {
@@ -56,7 +61,8 @@
                         class="absolute right-0 mt-2 bg-white text-gray-800 rounded shadow w-36 z-50">
                         <?php foreach (Widget::get('languageList') as $key => $val): ?>
                             <li>
-                                <a href="<?php echo Theme::URL('Index/SetLanguage', ['language' => $key]); ?>" class="block px-4 py-2 hover:bg-gray-100">
+                                <a href="<?php echo Theme::URL('Index/SetLanguage', ['language' => $key]); ?>"
+                                    class="block px-4 py-2 hover:bg-gray-100">
                                     <?php echo $val; ?>
                                 </a>
                             </li>
