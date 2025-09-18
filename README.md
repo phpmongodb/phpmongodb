@@ -52,3 +52,12 @@ php -S 0.0.0.0:8080 -t .
 ### Access in browser
 Open: <http://localhost:8080>
 
+
+
+## 📸 Screenshots
+
+### Dashboard – Collections View
+![Collections View](https://res.cloudinary.com/dinp1dyuh/image/upload/v1758177976/phpmongodb-index_iuivkk.png)
+
+### Records – Document Browser
+![Record Browser](https://res.cloudinary.com/dinp1dyuh/image/upload/v1758177977/phpmongodb-record_kfmxqm.png)
